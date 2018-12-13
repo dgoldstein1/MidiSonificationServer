@@ -15,15 +15,15 @@ import boto
 from boto.s3.key import Key
 
 
-def mag_to_pitch_tuned(magnitude, mymidi):
+def mag_to_pitch_tuned(magnitude, mymidi, min, max):
     # Where does this data point sit in the domain of your data? (I.E. the min magnitude is 3, the max in 5.6). In this case the optional 'True' means the scale is reversed, so the highest value will return the lowest percentage.
-    # scale_pct = mymidi.linear_scale_pct(3, 5.7, magnitude)
+    # scale_pct = mymidi.linear_scale_pct(min, max, magnitude)
 
     # Another option: Linear scale, reverse order
     # scale_pct = mymidi.linear_scale_pct(3, 5.7, magnitude, True)
 
     # Another option: Logarithmic scale, reverse order
-    scale_pct = mymidi.log_scale_pct(3, 5.7, magnitude, True)
+    scale_pct = mymidi.log_scale_pct(min, max, magnitude)
 
     # Pick a range of notes. This allows you to play in a key.
     c_major = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
@@ -39,15 +39,10 @@ def mag_to_pitch_tuned(magnitude, mymidi):
 
 # saves midi file locally
 def create_midi_file(fileName, bpm = 120, data = [], outputRange=2):
-	# first normalize data by standard deviation	
-
-	standardDeviation = stdev([d[1] for d in data])
-	magnitudeRange = max([d[1] for d in data]) - min([d[1] for d in data])
-	rangeTime = max([d[0] for d in data]) - min([d[0] for d in data])
-
-	print standardDeviation
-	print magnitudeRange
-	print rangeTime
+	# first normalize data by deviation
+	magnitudeMin = min([d[1] for d in data])
+	magnitudeMax = max([d[1] for d in data])
+	magnitudeRange = magnitudeMax - magnitudeMin
 
 	# (bpm, filename, sec per year, base octave,octave range)
 	mymidi = MIDITime(120, fileName, 5, 5, outputRange)
@@ -63,7 +58,7 @@ def create_midi_file(fileName, bpm = 120, data = [], outputRange=2):
 	for d in data:
 	    note_list.append([
 	        i * beatsPerDataPoint, # beat
-	        mag_to_pitch_tuned(d[1], mymidi),
+	        mag_to_pitch_tuned(d[1], mymidi, magnitudeMin, magnitudeMax),
 	        100,  # velocity
 	        i * beatsPerDataPoint  # duration, in beats
 	    ])
