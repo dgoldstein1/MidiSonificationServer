@@ -16,7 +16,7 @@ Simple server for creating and storing midi files
 class S(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        self.send_header('Content-type', 'application/json')
         self.end_headers()
 
     def do_GET(self):
@@ -24,8 +24,10 @@ class S(BaseHTTPRequestHandler):
         try:
             fileName = "myfile.mid"
             save_midi_file(fileName)
-            push_to_s3(fileName)
-
+            print "uploading '" + fileName + "' to s3"
+            url = push_to_s3(fileName)
+            print "url : " + url
+            self.wfile.write("{ url : " + url + " }")
         except Exception as e:
             print e
             self.wfile.write("Error : " + str(e))

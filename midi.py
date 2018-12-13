@@ -3,6 +3,8 @@
 """
 util for tranforming and saving midi files
 """
+import os
+
 # midi utils
 from miditime.miditime import MIDITime
 
@@ -19,9 +21,10 @@ def save_midi_file(fileName, bpm = 200, data = []):
 	mymidi.add_track(midinotes)
 	mymidi.save_midi()
 
+# uploads specified file to s3
+# returns url
 def push_to_s3(fileName):
-	print "uploading '" + fileName + "'"
-	conn = tinys3.Connection('AKIAJH4M5UKXPA4QJ6OQ','11/5NWgXiEqJUKgf4pjGgzF8M/MJrD715RZJV9of',tls=True)
+	conn = tinys3.Connection(os.environ["S3_ACCESS_KEY"],os.environ["S3_SECRET_ACCESS_KEY"],tls=True)
 	f = open(fileName,'rb')
-	conn.upload(fileName,f,'decipher-hackathon-2018')
-	print "https://s3.amazonaws.com/decipher-hackathon-2018/" + fileName
+	conn.upload(fileName,f,os.environ["S3_BUCKET_NAME"])
+	return os.environ["S3_BUCKET_URL"] + "/" + fileName
