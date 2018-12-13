@@ -3,8 +3,10 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from sys import argv
 import json
+import uuid
+import os
 
-from midi import save_midi_file, push_to_s3
+from midi import create_midi_file, push_to_s3
 
 
 """
@@ -25,7 +27,7 @@ class S(BaseHTTPRequestHandler):
         self._set_headers()
         try:
             fileName = "my file in folder"
-            save_midi_file(fileName)
+            create_midi_file(fileName)
             print "uploading '" + fileName + "' to s3"
             url = push_to_s3(fileName)
             data = {
@@ -44,15 +46,25 @@ class S(BaseHTTPRequestHandler):
     def do_POST(self):
         # set headers
         self._set_headers()
+
         # try to parse body
         body = None
+        values = None
+        fileName = str(uuid.uuid1()) + ".mid"
         try :
             bodyAsString = self.rfile.read(int(self.headers['Content-Length']))
             body = json.loads(bodyAsString)
+            values = body["result"][0]["values"]
         except Exception as e:
             self.wfile.write("Error : " + str(e))
             self.send_response(500)
             raise e
+
+        # create midi file
+        bpm = int(os.environ["BPM"])
+        outputRange = int(os.environ["OUTPUT_RANGE"])
+        key = os.environ["KEY"]
+        createdFile = create_midi_file(fileName, bpm=bpm, data=values, outputRange=outputRange, key=key)
 
         self.send_response(200)            
         self.end_headers()

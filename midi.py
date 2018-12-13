@@ -15,10 +15,9 @@ from boto.s3.key import Key
 
 
 # saves midi file locally
-def save_midi_file(fileName, bpm = 200, data = []):
-	# first transform data
+def create_midi_file(fileName, bpm = 120, data = [], outputRange=2, key="C"):
 
-	
+	mymidi = MIDITime(120, 'myfile.mid', 5, 5, 1)
 	mymidi = MIDITime(200, fileName)
 	mymidi.save_midi()
 
