@@ -3,7 +3,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from sys import argv
 
-from midi import save_midi_file
+from midi import save_midi_file, push_to_s3
 
 """
 Author: David Goldstein
@@ -22,9 +22,13 @@ class S(BaseHTTPRequestHandler):
     def do_GET(self):
         self._set_headers()
         try:
-            save_midi_file()
+            fileName = "myfile.mid"
+            save_midi_file(fileName)
+            push_to_s3(fileName)
+
         except Exception as e:
-            self.wfile.write(str(e))
+            print e
+            self.wfile.write("Error : " + str(e))
 
     def do_HEAD(self):
         self._set_headers()
