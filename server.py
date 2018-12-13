@@ -22,7 +22,7 @@ class S(BaseHTTPRequestHandler):
     def do_GET(self):
         self._set_headers()
         try:
-            fileName = "myfile.mid"
+            fileName = "my file in folder"
             save_midi_file(fileName)
             print "uploading '" + fileName + "' to s3"
             url = push_to_s3(fileName)
@@ -31,6 +31,7 @@ class S(BaseHTTPRequestHandler):
         except Exception as e:
             print e
             self.wfile.write("Error : " + str(e))
+            raise e
 
     def do_HEAD(self):
         self._set_headers()
