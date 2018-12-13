@@ -1,16 +1,17 @@
-"""
-Very simple HTTP server in python.
-Usage::
-    ./dummy-web-server.py [<port>]
-Send a GET request::
-    curl http://localhost
-Send a HEAD request::
-    curl -I http://localhost
-Send a POST request::
-    curl -d "foo=bar&bin=baz" http://localhost
-"""
+# server.py
+
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from sys import argv
+
+from midi import save_midi_file
+
+"""
+Author: David Goldstein
+Date : 12/13/18
+License : MIT
+
+Simple server for creating and storing midi files
+"""
 
 class S(BaseHTTPRequestHandler):
     def _set_headers(self):
@@ -20,7 +21,10 @@ class S(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self._set_headers()
-        self.wfile.write("<html><body><h1>hi!</h1></body></html>")
+        try:
+            save_midi_file()
+        except Exception as e:
+            self.wfile.write(str(e))
 
     def do_HEAD(self):
         self._set_headers()
@@ -33,7 +37,6 @@ class S(BaseHTTPRequestHandler):
 def run(server_class=HTTPServer, handler_class=S, port=8080):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print 'Starting httpd...'
     httpd.serve_forever()
 
 if __name__ == "__main__":
@@ -46,4 +49,4 @@ if __name__ == "__main__":
             run(port=port)
 
     except KeyboardInterrupt:
-        print 'shutting down the web server'
+        print 'shutting down'
