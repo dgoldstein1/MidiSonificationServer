@@ -10,4 +10,4 @@ export S3_FOLDER_PATH="lepidoptera"
 # soud settings
 export BPM=120
 export OUTPUT_RANGE=3
-export KEY=C
+export SONG_BEAT_LENGTH=60

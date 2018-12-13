@@ -63,8 +63,7 @@ class S(BaseHTTPRequestHandler):
         # create midi file
         bpm = int(os.environ["BPM"])
         outputRange = int(os.environ["OUTPUT_RANGE"])
-        key = os.environ["KEY"]
-        createdFile = create_midi_file(fileName, bpm=bpm, data=values, outputRange=outputRange, key=key)
+        createdFile = create_midi_file(fileName, bpm=bpm, data=values, outputRange=outputRange)
 
         self.send_response(200)            
         self.end_headers()
