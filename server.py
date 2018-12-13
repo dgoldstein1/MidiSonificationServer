@@ -2,8 +2,10 @@
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from sys import argv
+import json
 
 from midi import save_midi_file, push_to_s3
+
 
 """
 Author: David Goldstein
@@ -26,20 +28,36 @@ class S(BaseHTTPRequestHandler):
             save_midi_file(fileName)
             print "uploading '" + fileName + "' to s3"
             url = push_to_s3(fileName)
-            print "url : " + url
-            self.wfile.write("{ url : " + url + " }")
+            data = {
+                'url' : url
+            }
+            print data
+            self.wfile.write(data)
         except Exception as e:
-            print e
             self.wfile.write("Error : " + str(e))
+            self.send_response(500)
             raise e
 
     def do_HEAD(self):
         self._set_headers()
         
     def do_POST(self):
-        # Doesn't do anything with posted data
+        # set headers
         self._set_headers()
-        self.wfile.write("<html><body><h1>POST!</h1></body></html>")
+        # try to parse body
+        body = None
+        try :
+            bodyAsString = self.rfile.read(int(self.headers['Content-Length']))
+            body = json.loads(bodyAsString)
+        except Exception as e:
+            self.wfile.write("Error : " + str(e))
+            self.send_response(500)
+            raise e
+
+        self.send_response(200)            
+        self.end_headers()
+
+        self.wfile.write(body)
         
 def run(server_class=HTTPServer, handler_class=S, port=8080):
     server_address = ('', port)
