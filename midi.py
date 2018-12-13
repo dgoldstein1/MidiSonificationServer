@@ -4,6 +4,7 @@
 util for tranforming and saving midi files
 """
 import os
+import datetime
 
 # midi utils
 from miditime.miditime import MIDITime
@@ -16,9 +17,11 @@ from boto.s3.key import Key
 
 # saves midi file locally
 def create_midi_file(fileName, bpm = 120, data = [], outputRange=2, key="C"):
+	# (bpm, filename, sec per year, base octave,octave range)
+	mymidi = MIDITime(120, fileName, 5, 5, outputRange)
+	# add {'event_date': , 'magnitude': }
+	transformedData = [{'days_since_epoch': mymidi.days_since_epoch(datetime.datetime.fromtimestamp(d[0] / 1e3)), 'magnitude': d[1]} for d in data]
 
-	mymidi = MIDITime(120, 'myfile.mid', 5, 5, 1)
-	mymidi = MIDITime(200, fileName)
 	mymidi.save_midi()
 
 # uploads specified file to s3
