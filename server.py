@@ -51,18 +51,26 @@ class S(BaseHTTPRequestHandler):
         body = None
         values = None
         fileName = str(uuid.uuid1()) + ".mid"
+        bpm = None
+        outputRange = None
+        songBeatLength = None
         try :
+            # parse data
             bodyAsString = self.rfile.read(int(self.headers['Content-Length']))
             body = json.loads(bodyAsString)
-            values = body["result"][0]["values"]
+            values = body["data"]["result"][0]["values"]
+            # parse settings
+            bpm = body["songSettings"]["bpm"]
+            outputRange = body["songSettings"]["outputRange"]
+            songBeatLength = body["songSettings"]["songBeatLength"]
         except Exception as e:
             self.wfile.write("Error : " + str(e))
             self.send_response(500)
             raise e
 
+
+
         # create midi file
-        bpm = int(os.environ["BPM"])
-        outputRange = int(os.environ["OUTPUT_RANGE"])
         createdFile = create_midi_file(fileName, bpm=bpm, data=values, outputRange=outputRange)
 
         self.send_response(200)            

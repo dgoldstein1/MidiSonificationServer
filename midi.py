@@ -38,7 +38,7 @@ def mag_to_pitch_tuned(magnitude, mymidi, min, max):
     return midi_pitch
 
 # saves midi file locally
-def create_midi_file(fileName, bpm = 120, data = [], outputRange=2):
+def create_midi_file(fileName, bpm = 120, data = [], outputRange=2, songBeatLength=60):
 	# first normalize data by deviation
 	magnitudeMin = min([d[1] for d in data])
 	magnitudeMax = max([d[1] for d in data])
@@ -52,8 +52,7 @@ def create_midi_file(fileName, bpm = 120, data = [], outputRange=2):
 
 	# tie everything to 60 beats
 	# [time, pitch, velocity, duration]
-	numberOfBeats = int(os.environ["SONG_BEAT_LENGTH"])
-	beatsPerDataPoint = float(numberOfBeats) / len(data)
+	beatsPerDataPoint = float(songBeatLength) / len(data)
 	i = 0
 	for d in data:
 	    note_list.append([
