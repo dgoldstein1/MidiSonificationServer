@@ -48,7 +48,7 @@ def create_midi_file(fileName, bpm = 120, data = [], outputRange=2, songBeatLeng
 
 
 	# (bpm, filename, sec per year, base octave,octave range)
-	mymidi = MIDITime(120, fileName, 5, 4, outputRange)
+	mymidi = MIDITime(bpm, fileName, 5, 4, outputRange)
 	# add {'event_date': , 'magnitude': }
 
 	note_list = []
