@@ -75,6 +75,9 @@ class S(BaseHTTPRequestHandler):
         self.wfile.write({
             'url' :  url
         })
+
+        # remove created file
+        os.remove(fileName)
         
 def run(server_class=HTTPServer, handler_class=S, port=8080):
     server_address = ('', port)
