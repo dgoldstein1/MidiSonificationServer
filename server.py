@@ -23,23 +23,6 @@ class S(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'application/json')
         self.end_headers()
 
-    def do_GET(self):
-        self._set_headers()
-        try:
-            fileName = "my file in folder"
-            create_midi_file(fileName)
-            print "uploading '" + fileName + "' to s3"
-            url = push_to_s3(fileName)
-            data = {
-                'url' : url
-            }
-            print data
-            self.wfile.write(data)
-        except Exception as e:
-            self.wfile.write("Error : " + str(e))
-            self.send_response(500)
-            raise e
-
     def do_HEAD(self):
         self._set_headers()
         
@@ -68,15 +51,30 @@ class S(BaseHTTPRequestHandler):
             self.send_response(500)
             raise e
 
-
-
         # create midi file
-        createdFile = create_midi_file(fileName, bpm=bpm, data=values, outputRange=outputRange)
+        try:
+            createdFile = create_midi_file(fileName, bpm=bpm, data=values, outputRange=outputRange)
+        except Exception as e:
+            self.wfile.write("Could not create midi file : " + str(e))
+            self.send_response(500)
+            raise e
 
+        url = None
+        try:
+            url = push_to_s3(fileName)
+        except Exception as e:
+            self.wfile.write("Could not create midi file : " + str(e))
+            self.send_response(500)
+            raise e            
+
+        print "pushed to s3 {}".format(url)
+        # write response
         self.send_response(200)            
         self.end_headers()
 
-        self.wfile.write(body)
+        self.wfile.write({
+            'url' :  url
+        })
         
 def run(server_class=HTTPServer, handler_class=S, port=8080):
     server_address = ('', port)
