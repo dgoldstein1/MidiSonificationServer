@@ -29,7 +29,6 @@ class S(BaseHTTPRequestHandler):
     def do_POST(self):
         # set headers
         self._set_headers()
-
         # try to parse body
         body = None
         values = None
@@ -67,14 +66,9 @@ class S(BaseHTTPRequestHandler):
             self.send_response(500)
             raise e            
 
-        print "pushed to s3 {}".format(url)
-        # write response
-        self.send_response(200)            
-        self.end_headers()
+        print "pushed to s3 {}".format(url)     
 
-        self.wfile.write({
-            'url' :  url
-        })
+        self.wfile.write(url)
 
         # remove created file
         os.remove(fileName)
