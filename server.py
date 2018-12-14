@@ -55,7 +55,6 @@ class S(BaseHTTPRequestHandler):
             createdFile = create_midi_file(fileName, bpm=bpm, data=values, outputRange=outputRange)
         except Exception as e:
             self.wfile.write("Could not create midi file : " + str(e))
-            self.send_response(500)
             raise e
 
         url = None
@@ -63,7 +62,6 @@ class S(BaseHTTPRequestHandler):
             url = push_to_s3(fileName)
         except Exception as e:
             self.wfile.write("Could not create midi file : " + str(e))
-            self.send_response(500)
             raise e            
 
         print "pushed to s3 {}".format(url)     

@@ -20,10 +20,10 @@ def mag_to_pitch_tuned(magnitude, mymidi, min, max):
     # scale_pct = mymidi.linear_scale_pct(min, max, magnitude)
 
     # Another option: Linear scale, reverse order
-    # scale_pct = mymidi.linear_scale_pct(3, 5.7, magnitude, True)
+    scale_pct = mymidi.linear_scale_pct(min, max, magnitude)
 
     # Another option: Logarithmic scale, reverse order
-    scale_pct = mymidi.log_scale_pct(min, max, magnitude)
+    # scale_pct = mymidi.log_scale_pct(min, max, magnitude)
 
     # Pick a range of notes. This allows you to play in a key.
     c_major = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
@@ -40,26 +40,29 @@ def mag_to_pitch_tuned(magnitude, mymidi, min, max):
 # saves midi file locally
 def create_midi_file(fileName, bpm = 120, data = [], outputRange=2, songBeatLength=60):
 	# first normalize data by deviation
-	magnitudeMin = min([d[1] for d in data])
-	magnitudeMax = max([d[1] for d in data])
-	magnitudeRange = magnitudeMax - magnitudeMin
+	magnitudeMean = sum([d[1] for d in data]) / len([d[1] for d in data])
+
+	deviations = [(d[1] - magnitudeMean) for d in data]
+	magnitudeMin = min(deviations)
+	magnitudeMax = max(deviations)
+
 
 	# (bpm, filename, sec per year, base octave,octave range)
-	mymidi = MIDITime(120, fileName, 5, 5, outputRange)
+	mymidi = MIDITime(120, fileName, 5, 4, outputRange)
 	# add {'event_date': , 'magnitude': }
 
 	note_list = []
 
 	# tie everything to 60 beats
 	# [time, pitch, velocity, duration]
-	beatsPerDataPoint = float(songBeatLength) / len(data)
+	beatsPerDataPoint = float(songBeatLength) / len(deviations)
 	i = 0
-	for d in data:
+	for d in deviations:
 	    note_list.append([
 	        i * beatsPerDataPoint, # beat
-	        mag_to_pitch_tuned(d[1], mymidi, magnitudeMin, magnitudeMax),
+	        mag_to_pitch_tuned(d, mymidi, magnitudeMin, magnitudeMax),
 	        100,  # velocity
-	        i * beatsPerDataPoint  # duration, in beats
+	        beatsPerDataPoint  # duration, in beats
 	    ])
 	    i=i+1
 
