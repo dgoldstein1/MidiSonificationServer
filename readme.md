@@ -57,7 +57,7 @@ To create a new docker image..
 
 ## Authors
 
-* **David Goldstein** - [DavidCharlesGoldstein.com](http://www.davidcharlesgoldstein.com/) - [Decipher Technology Studios](http://deciphernow.com/)
+* **David Goldstein** - [DavidCharlesGoldstein.com](http://www.davidcharlesgoldstein.com/?github-midifsonification-server) - [Decipher Technology Studios](http://deciphernow.com/)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
